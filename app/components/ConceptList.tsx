@@ -4,27 +4,35 @@ interface ConceptListProps {
   concepts: string[];
   selected: string | null;
   onSelect: (concept: string) => void;
-  disabled: boolean;  // prevent re-selection while generating
+  disabled: boolean;
 }
 
-// Renders selectable concept cards. Selected card gets an indigo highlight border.
+// Light-on-dark concept cards with radio buttons — matches existing app Step 2 style
 export default function ConceptList({ concepts, selected, onSelect, disabled }: ConceptListProps) {
   return (
-    <ul className="flex flex-col gap-3 w-full max-w-xl">
+    <div className="space-y-2">
       {concepts.map((concept, i) => (
-        <li
+        <label
           key={i}
-          onClick={() => !disabled && onSelect(concept)}
-          className={`rounded-lg border px-4 py-3 text-sm transition-colors
-            ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}
+          className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors
+            ${disabled ? "cursor-not-allowed opacity-60" : ""}
             ${selected === concept
-              ? "border-indigo-500 bg-indigo-950 text-indigo-100"
-              : "border-slate-600 bg-slate-800 text-slate-200 hover:border-indigo-500 hover:bg-slate-700"
+              ? "border-indigo-400 bg-indigo-50"
+              : "bg-slate-100 border-slate-300 hover:bg-white hover:border-slate-400"
             }`}
         >
-          {concept}
-        </li>
+          <input
+            type="radio"
+            name="concept"
+            value={concept}
+            checked={selected === concept}
+            onChange={() => !disabled && onSelect(concept)}
+            disabled={disabled}
+            className="mt-0.5 accent-indigo-600 flex-shrink-0"
+          />
+          <span className="text-sm text-slate-700 leading-snug">{concept}</span>
+        </label>
       ))}
-    </ul>
+    </div>
   );
 }
