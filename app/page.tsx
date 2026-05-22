@@ -10,7 +10,7 @@ import { streamSSE } from "./hooks/useStreamSSE";
 const FASTAPI = "http://localhost:8000";
 
 // Which step the user is currently on — controls which sections are visible
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
 
 // Spinner + message box shown while an SSE stream is in progress
 function StatusBox({ message }: { message: string }) {
@@ -53,6 +53,10 @@ export default function Home() {
   const [concepts, setConcepts] = useState<string[]>([]);
   const [selectedConcept, setSelectedConcept] = useState<string | null>(null);
   const [variantUrls, setVariantUrls] = useState<string[]>([]);
+  const [variantPaths, setVariantPaths] = useState<string[]>([]);  // disk paths for finalize
+  const [variantPrompts, setVariantPrompts] = useState<string[]>([]);  // prompts for finalize
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState<number | null>(null);
+  const [finalUrl, setFinalUrl] = useState<string | null>(null);
   const [step, setStep] = useState<Step>(1);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -90,6 +94,10 @@ export default function Home() {
   async function handleGenerate(concept: string) {
     setSelectedConcept(concept);
     setVariantUrls([]);
+    setVariantPaths([]);
+    setVariantPrompts([]);
+    setSelectedVariantIdx(null);
+    setFinalUrl(null);
     setLoading(true);
     setLoadingStep(2);
     setError("");
@@ -100,7 +108,34 @@ export default function Home() {
       variants: (e) => {
         const urls = (e.urls as string[]).map((u) => `${FASTAPI}${u}`);
         setVariantUrls(urls);
+        setVariantPaths(e.paths as string[]);
+        setVariantPrompts(e.prompts as string[]);
         setStep(3);
+        setStatus("");
+        setLoading(false);
+      },
+      error: (e) => { setError(e.message as string); setLoading(false); },
+    });
+  }
+
+  // Step 3 → 4: upscale selected variant to final resolution
+  async function handleFinalize() {
+    if (selectedVariantIdx === null) return;
+    setFinalUrl(null);
+    setLoading(true);
+    setLoadingStep(3);
+    setError("");
+    setStatus(`Generating final design...`);
+
+    await streamSSE(`${FASTAPI}/api/finalize`, {
+      prompt: variantPrompts[selectedVariantIdx],
+      variant_path: variantPaths[selectedVariantIdx],
+      final_size: "1K",
+    }, {
+      status: (e) => setStatus(e.message as string),
+      final: (e) => {
+        setFinalUrl(`${FASTAPI}${e.url as string}`);
+        setStep(4 as Step);
         setStatus("");
         setLoading(false);
       },
@@ -142,10 +177,54 @@ export default function Home() {
             </StepCard>
           )}
 
-          {/* Step 3: Generated variants — appears after generate */}
+          {/* Step 3: Generated variants — click to select, then finalize */}
           {step >= 3 && variantUrls.length > 0 && (
             <StepCard number={3} title="Generated variants">
-              <VariantGrid urls={variantUrls} />
+              <p className="text-xs text-slate-300 mb-3">Click a variant to select it, then finalize at higher resolution.</p>
+              <VariantGrid
+                urls={variantUrls}
+                selectedIdx={selectedVariantIdx}
+                onSelect={setSelectedVariantIdx}
+                disabled={loading}
+              />
+              {/* Finalize button — only shown once a variant is selected */}
+              {selectedVariantIdx !== null && (
+                <button
+                  onClick={handleFinalize}
+                  disabled={loading}
+                  className="mt-4 flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading && loadingStep === 3 && (
+                    <svg className="animate-spin h-3 w-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  )}
+                  ✨ Finalize variant {selectedVariantIdx + 1}
+                </button>
+              )}
+              {loadingStep === 3 && status && <div className="mt-3"><StatusBox message={status} /></div>}
+              {loadingStep === 3 && error && <div className="mt-3"><ErrorBox message={error} onDismiss={resetError} /></div>}
+            </StepCard>
+          )}
+
+          {/* Step 4: Final high-resolution image */}
+          {step >= 4 && finalUrl && (
+            <StepCard number={4} title="Final design">
+              <div className="relative aspect-square w-full rounded-lg overflow-hidden border border-slate-600 bg-slate-900">
+                <img
+                  src={finalUrl}
+                  alt="Final design"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <a
+                href={finalUrl}
+                download
+                className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-600 text-white text-xs font-medium rounded-lg hover:bg-slate-500 transition-colors"
+              >
+                ⬇ Download PNG
+              </a>
             </StepCard>
           )}
 
