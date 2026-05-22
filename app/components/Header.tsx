@@ -2,10 +2,12 @@ interface HeaderProps {
   columnCount: number;
   maxColumns: number;
   onAddColumn: () => void;
+  onToggleBrowser: () => void;
+  browserOpen: boolean;
 }
 
-// Top navigation bar with column controls
-export default function Header({ columnCount, maxColumns, onAddColumn }: HeaderProps) {
+// Top navigation bar with column controls and browser toggle
+export default function Header({ columnCount, maxColumns, onAddColumn, onToggleBrowser, browserOpen }: HeaderProps) {
   return (
     <header className="bg-slate-700 border-b border-slate-600 px-5 py-3 flex items-center gap-4 flex-shrink-0">
       <span className="text-xl" aria-hidden="true">👕</span>
@@ -27,6 +29,17 @@ export default function Header({ columnCount, maxColumns, onAddColumn }: HeaderP
           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-600 text-white text-xs font-medium rounded-lg hover:bg-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           + Add column
+        </button>
+        <button
+          onClick={onToggleBrowser}
+          aria-pressed={browserOpen}
+          title="Toggle output browser"
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors
+            ${browserOpen
+              ? "bg-indigo-600 text-white hover:bg-indigo-700"
+              : "bg-slate-600 text-white hover:bg-slate-500"}`}
+        >
+          📁 Browse
         </button>
       </div>
     </header>

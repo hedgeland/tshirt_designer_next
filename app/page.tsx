@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Header from "./components/Header";
 import DesignerColumn from "./components/DesignerColumn";
+import ObjectBrowser from "./components/ObjectBrowser";
 
 const MAX_COLUMNS = 4;
 
 export default function Home() {
-  // Each entry is a unique ID used as the React key — stable across add/remove
   const [columns, setColumns] = useState<number[]>([1]);
   const [nextId, setNextId] = useState(2);
+  const [browserOpen, setBrowserOpen] = useState(false);
 
   function addColumn() {
     if (columns.length >= MAX_COLUMNS) return;
@@ -28,6 +29,8 @@ export default function Home() {
         columnCount={columns.length}
         maxColumns={MAX_COLUMNS}
         onAddColumn={addColumn}
+        onToggleBrowser={() => setBrowserOpen((v) => !v)}
+        browserOpen={browserOpen}
       />
 
       {/* Horizontal scroll container — each column scrolls independently */}
@@ -41,6 +44,12 @@ export default function Home() {
           />
         ))}
       </div>
+
+      {/* Object browser slides in from the right as a modal panel */}
+      <ObjectBrowser
+        open={browserOpen}
+        onClose={() => setBrowserOpen(false)}
+      />
     </div>
   );
 }
