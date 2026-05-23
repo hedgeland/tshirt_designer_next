@@ -15,9 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "T-Shirt Design Generator",
   description: "Generate print-on-demand t-shirt designs using Gemini AI",
-  icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-  },
+
 };
 
 export default function RootLayout({
