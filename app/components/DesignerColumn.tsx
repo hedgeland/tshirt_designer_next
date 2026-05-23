@@ -333,12 +333,19 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
     });
   }
 
-  // Go Direct — skip brainstorm, use theme as the concept and generate immediately
+  // Go Direct — skip brainstorm, use theme as the concept and generate immediately.
+  // Each Go Direct run replaces the previous variants (fresh start); concept-based
+  // generates accumulate instead (see handleGenerate).
   async function handleGoDirect() {
     if (!theme.trim()) return;
     setDirectMode(true);
-    setStep(2);  // show Step 2 with the direct mode message immediately
+    setStep(2);
     setGoingDirect(true);
+    setVariantUrls([]);
+    setVariantPaths([]);
+    setVariantPrompts([]);
+    setSelectedVariantIdx(null);
+    setFinalUrl(null);
     await handleGenerate(theme.trim());
     setGoingDirect(false);
   }
