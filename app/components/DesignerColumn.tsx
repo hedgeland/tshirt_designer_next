@@ -345,9 +345,7 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
 
   async function handleGenerate(concept: string) {
     setSelectedConcept(concept);
-    setVariantUrls([]);
-    setVariantPaths([]);
-    setVariantPrompts([]);
+    // Keep previous variants — new batch will be appended, not replaced
     setSelectedVariantIdx(null);
     setFinalUrl(null);
     setLoading(true);
@@ -373,9 +371,9 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
       status: (e) => setStatus(e.message as string),
       variants: (e) => {
         const urls = (e.urls as string[]).map((u) => `${FASTAPI}${u}`);
-        setVariantUrls(urls);
-        setVariantPaths(e.paths as string[]);
-        setVariantPrompts(e.prompts as string[]);
+        setVariantUrls((prev) => [...prev, ...urls]);
+        setVariantPaths((prev) => [...prev, ...(e.paths as string[])]);
+        setVariantPrompts((prev) => [...prev, ...(e.prompts as string[])]);
         setStep(3);
         setStatus("");
         setLoading(false);
@@ -573,6 +571,7 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
                 onSelect={setSelectedConcept}
                 onGenerate={() => selectedConcept && handleGenerate(selectedConcept)}
                 disabled={loading}
+                numVariants={defaultNumVariants}
               />
             )}
             {!directMode && loadingStep === 2 && status && <div className="mt-3"><StatusBox message={status} /></div>}

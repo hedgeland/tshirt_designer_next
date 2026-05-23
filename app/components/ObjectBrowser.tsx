@@ -409,7 +409,8 @@ export default function ObjectBrowser({ open, onClose, columnCount, activeColIdx
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { if (open && sessions.length === 0) load(); }, [open, sessions.length, load]);
+  // Refresh every time the browser opens so new sessions from generate calls are visible
+  useEffect(() => { if (open) load(); }, [open, load]);
 
   // Follow the active column; user can still override via the picker
   useEffect(() => { setTargetCol(activeColIdx); }, [activeColIdx]);
