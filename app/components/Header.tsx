@@ -1,13 +1,19 @@
+const MAX_VARIANTS = 4;
+
 interface HeaderProps {
   columnCount: number;
   maxColumns: number;
   onAddColumn: () => void;
   onToggleBrowser: () => void;
   browserOpen: boolean;
+  defaultNumVariants: number;
+  onDefaultNumVariantsChange: (n: number) => void;
 }
 
-// Top navigation bar with column controls and browser toggle
-export default function Header({ columnCount, maxColumns, onAddColumn, onToggleBrowser, browserOpen }: HeaderProps) {
+export default function Header({
+  columnCount, maxColumns, onAddColumn, onToggleBrowser, browserOpen,
+  defaultNumVariants, onDefaultNumVariantsChange,
+}: HeaderProps) {
   return (
     <header className="bg-slate-700 border-b border-slate-600 px-5 py-3 flex items-center gap-4 flex-shrink-0">
       <span className="text-xl" aria-hidden="true">👕</span>
@@ -18,7 +24,29 @@ export default function Header({ columnCount, maxColumns, onAddColumn, onToggleB
         </p>
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-4">
+
+        {/* Global default variant count */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="global-num-variants" className="text-xs text-slate-400 whitespace-nowrap">
+            Variants
+          </label>
+          <input
+            id="global-num-variants"
+            type="range"
+            min={1}
+            max={MAX_VARIANTS}
+            step={1}
+            value={defaultNumVariants}
+            onChange={(e) => onDefaultNumVariantsChange(parseInt(e.target.value))}
+            className="w-20 accent-indigo-400"
+            title={`Default variants per column: ${defaultNumVariants}`}
+          />
+          <span className="text-xs font-semibold text-indigo-300 w-3 text-center">
+            {defaultNumVariants}
+          </span>
+        </div>
+
         <span className="text-xs text-slate-400">
           {columnCount} / {maxColumns} columns
         </span>
