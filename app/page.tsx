@@ -27,7 +27,7 @@ export default function Home() {
     } catch {}
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [browserOpen, setBrowserOpen] = useState(false);
-  const [defaultNumVariants, setDefaultNumVariants] = useLocalStorage("defaultNumVariants", 4);
+  const [defaultNumVariants, setDefaultNumVariants] = useLocalStorage("defaultNumVariants", 2);
 
 
   // Active column index (0-based); drives the highlight and the browser's default target
