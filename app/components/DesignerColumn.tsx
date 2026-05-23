@@ -552,6 +552,7 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
             disabled={loading}
             brainstorming={loading && loadingStep === 1}
             goingDirect={goingDirect}
+            numVariants={defaultNumVariants}
           />
           {(loadingStep === 1 || goingDirect) && status && <div className="mt-3"><StatusBox message={status} /></div>}
           {(loadingStep === 1 || goingDirect) && error && <div className="mt-3"><ErrorBox message={error} onDismiss={resetError} /></div>}

@@ -12,9 +12,10 @@ interface ThemeInputProps {
   disabled: boolean;
   brainstorming: boolean;  // true only while brainstorm SSE is in flight
   goingDirect: boolean;   // true only while Go Direct generation is in flight
+  numVariants: number;    // shown on the button so the user knows how many will generate
 }
 
-export default function ThemeInput({ theme, onChange, onBrainstorm, onGoDirect, onPickRequest, onUpload, disabled, brainstorming, goingDirect }: ThemeInputProps) {
+export default function ThemeInput({ theme, onChange, onBrainstorm, onGoDirect, onPickRequest, onUpload, disabled, brainstorming, goingDirect, numVariants }: ThemeInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -54,7 +55,10 @@ export default function ThemeInput({ theme, onChange, onBrainstorm, onGoDirect, 
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
           )}
-          <span aria-hidden="true">🎨</span> Go Direct!
+          <span className="flex flex-col items-start leading-tight">
+            <span><span aria-hidden="true">🎨</span> Go Direct!</span>
+            <span className="opacity-70">{numVariants} Variant{numVariants !== 1 ? "s" : ""}</span>
+          </span>
         </button>
         <button
           onClick={onBrainstorm}
