@@ -227,7 +227,7 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
   const [collapsedSteps, setCollapsedSteps] = useState<Set<number>>(new Set());
   // Reference image for variant generation (set from the object browser via 🎯)
   const [referenceImageUrl, setReferenceImageUrl] = useState<string | null>(null);
-  const [referenceMode, setReferenceMode] = useState<"style" | "copy" | "edit">("style");
+  const [referenceMode, setReferenceMode] = useState<"style" | "copy">("style");
 
   // The set of step numbers currently visible (rendered in the DOM)
   const visibleSteps = [1, ...(step >= 2 ? [2] : []), ...(step >= 3 && variantUrls.length > 0 ? [3] : []), ...(step >= 4 && finalUrl ? [4] : [])];
@@ -502,7 +502,7 @@ export default function DesignerColumn({ columnNumber, isActive, onActivate, onR
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-semibold text-amber-400 uppercase tracking-wider mb-1">Reference image</p>
             <div className="flex gap-1">
-              {(["style", "copy", "edit"] as const).map((m) => (
+              {(["style", "copy"] as const).map((m) => (
                 <button
                   key={m}
                   onClick={(e) => { e.stopPropagation(); setReferenceMode(m); }}
